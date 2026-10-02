@@ -12,6 +12,7 @@ import About from "@/components/About";
 import Footer from "@/components/Footer";
 import SpectralGhost from "@/components/SpectralGhost";
 import ClosingParticleImage from "@/components/ClosingParticleImage";
+import Contact from "@/components/Contact";
 
 const particles = [
   { left: "12%", top: "18%", size: 4, opacity: 0.9 },
@@ -32,6 +33,7 @@ export default function Home() {
   return (
     <LenisProvider>
       <main className="site-shell">
+
         {/* Loading */}
         <Loader />
 
@@ -41,6 +43,7 @@ export default function Home() {
         {/* Global Atmosphere */}
         <div className="noise-layer" aria-hidden="true" />
         <div className="vignette" aria-hidden="true" />
+
         <div className="particle-field" aria-hidden="true">
           {particles.map((particle, index) => (
             <span
@@ -79,32 +82,14 @@ export default function Home() {
         <About />
 
         {/* Contact */}
-        <section id="contact" className="contact-section">
-          <div className="section-inner" style={{ textAlign: "center" }}>
-            <p className="section-label" style={{ justifyContent: "center" }}>
-              Contact
-            </p>
-            <h2 className="section-heading contact-heading">
-              Let&apos;s create
-              <br />
-              something memorable.
-            </h2>
-            <a href="mailto:hello@trivents.club" className="contact-email">
-              hello@trivents.club
-            </a>
-            <div className="contact-action-wrap">
-              <a href="mailto:hello@trivents.club" className="contact-button">
-                Start a project
-              </a>
-            </div>
-          </div>
-        </section>
+        <Contact />
 
-        {/* Closing Particle Image */}
+        {/* ONE Closing Particle Image Effect */}
         <ClosingParticleImage />
 
         {/* Footer */}
         <Footer />
+
       </main>
     </LenisProvider>
   );

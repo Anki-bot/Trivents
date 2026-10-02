@@ -1059,7 +1059,7 @@ export default function SpectralGhost() {
           new THREE.MeshBasicMaterial({
             color: 0xffff44,
             transparent: true,
-            opacity: 0.9,
+            opacity: 1,
           });
 
         const firefly =
@@ -1085,7 +1085,7 @@ export default function SpectralGhost() {
           new THREE.MeshBasicMaterial({
             color: 0xffff88,
             transparent: true,
-            opacity: 0.4,
+            opacity: 1,
             side: THREE.BackSide,
           });
 

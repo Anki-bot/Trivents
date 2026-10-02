@@ -77,7 +77,7 @@ export default function Footer() {
             <h4>Contact</h4>
             <ul>
               <li>
-                <a href="mailto:hello@trivents.club">hello@trivents.club</a>
+                <a href="mailto:creative.trivents@gmail.com">creative.trivents@gmail.com</a>
               </li>
               <li>
                 <a
