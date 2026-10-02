@@ -24,18 +24,18 @@ export default function ClosingParticleImage() {
     // =========================================================
 
     // Lower = fewer image pixels
-    const SAMPLE_WIDTH = 240;
+    const SAMPLE_WIDTH = 150;
 
     // VERY SUBTLE VISIBILITY
     // 0.12 = 12%
-    const MAX_OPACITY = 0.12;
+    const MAX_OPACITY = 0.2;
 
     // How far the image pixels scatter
     const SCATTER_DISTANCE = 950;
 
     // Pixel size
     // Increase to 5.0 for even chunkier pixels
-    const PIXEL_SIZE_MULTIPLIER = 4.0;
+    const PIXEL_SIZE_MULTIPLIER = 0.45;
 
     // =========================================================
     // HELPERS
