@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Bot,
   Globe,
@@ -8,8 +8,18 @@ import {
   Sparkles,
   ArrowUp,
   X,
+  CornerDownLeft,
+  Terminal,
 } from "lucide-react";
+import RIVENHeadline from "./RIVENHeadline";
+import Reveal from "./Reveal";
 
+const SUGGESTIONS = [
+  "What is Trivents?",
+  "Tell me about upcoming events",
+  "How can I join the creative team?",
+  "Who are the core creators?",
+];
 
 export default function RIVENSection() {
   const [messages, setMessages] = useState([]);
@@ -17,9 +27,11 @@ export default function RIVENSection() {
   const [showSearch, setShowSearch] = useState(true);
   const [attachment, setAttachment] = useState(null);
   const [isThinking, setIsThinking] = useState(false);
+  const textareaRef = useRef(null);
 
-  const handleSubmit = () => {
-    const trimmed = value.trim();
+  const handleSubmit = (textToSend) => {
+    const prompt = typeof textToSend === "string" ? textToSend : value;
+    const trimmed = prompt.trim();
 
     if (!trimmed || isThinking) return;
 
@@ -29,11 +41,7 @@ export default function RIVENSection() {
       content: trimmed,
     };
 
-    setMessages((current) => [
-      ...current,
-      userMessage,
-    ]);
-
+    setMessages((current) => [...current, userMessage]);
     setValue("");
     setIsThinking(true);
 
@@ -47,20 +55,13 @@ export default function RIVENSection() {
           "RIVEN is ready. The RAG backend will be connected here later.",
       };
 
-      setMessages((current) => [
-        ...current,
-        RIVENMessage,
-      ]);
-
+      setMessages((current) => [...current, RIVENMessage]);
       setIsThinking(false);
     }, 900);
   };
 
   const handleKeyDown = (event) => {
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey
-    ) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSubmit();
     }
@@ -68,9 +69,7 @@ export default function RIVENSection() {
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
-
     if (!file) return;
-
     setAttachment(file);
   };
 
@@ -78,194 +77,208 @@ export default function RIVENSection() {
     setAttachment(null);
   };
 
+  const handleSuggestionClick = (suggestion) => {
+    setValue(suggestion);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
   return (
-  <section
-    id="RIVEN"
-    className="RIVEN-section"
-  >
-    {/* Ambient glow */}
-    <div
-      className="RIVEN-ambient"
-      aria-hidden="true"
-    />
+    <section id="RIVEN" className="RIVEN-section">
+      {/* Ambient background glow */}
+      <div className="RIVEN-ambient" aria-hidden="true" />
+      <div className="RIVEN-ambient-accent" aria-hidden="true" />
 
-    <div className="RIVEN-content">
+      <div className="RIVEN-content">
+        {/* Header Block */}
+        <Reveal>
+          <div className="RIVEN-kicker">
+            <span className="RIVEN-status-dot" />
+            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            <span>TRIVENTS INTELLIGENCE SYSTEM</span>
+          </div>
 
-      {/* Small label */}
-      <div className="RIVEN-kicker">
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>TRIVENTS INTELLIGENCE</span>
-      </div>
+          <RIVENHeadline />
 
-      <p className="RIVEN-description">
-        Your intelligent interface for
-        everything happening across
-        the Trivents universe.
-      </p>
+          <p className="RIVEN-subtitle">
+            Your interactive intelligence interface for everything happening
+            across the Trivents universe — from events and stories to community
+            collaborations.
+          </p>
+        </Reveal>
 
-      {/* Conversation */}
-      {messages.length > 0 && (
-        <div className="RIVEN-conversation">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={
-                message.role === "user"
-                  ? "RIVEN-message-row user"
-                  : "RIVEN-message-row"
-              }
-            >
-              {message.role === "RIVEN" ? (
-                <div className="RIVEN-response">
-                  <div className="RIVEN-response-icon">
-                    <Bot className="h-4 w-4" />
-                  </div>
+        {/* Command Center Card */}
+        <Reveal delay={1} className="RIVEN-console-shell">
+          <div className="RIVEN-console-topbar">
+            <div className="RIVEN-topbar-left">
+              <span className="RIVEN-window-btn red" />
+              <span className="RIVEN-window-btn yellow" />
+              <span className="RIVEN-window-btn green" />
+              <span className="RIVEN-console-id">
+                <Terminal className="h-3 w-3" />
+                riven-core-v1.0
+              </span>
+            </div>
+            <div className="RIVEN-topbar-right">
+              <span className="RIVEN-mode-tag">
+                {showSearch ? "LIVE WEB ENABLED" : "LOCAL CONTEXT"}
+              </span>
+            </div>
+          </div>
 
-                  <div>
-                    <div className="RIVEN-response-label">
-                      RIVEN
+          {/* Conversation Stream */}
+          {messages.length > 0 ? (
+            <div className="RIVEN-conversation">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={
+                    message.role === "user"
+                      ? "RIVEN-message-row user"
+                      : "RIVEN-message-row"
+                  }
+                >
+                  {message.role === "RIVEN" ? (
+                    <div className="RIVEN-response">
+                      <div className="RIVEN-response-icon">
+                        <Bot className="h-4 w-4" />
+                      </div>
+                      <div className="RIVEN-response-body">
+                        <div className="RIVEN-response-header">
+                          <span className="RIVEN-response-label">RIVEN</span>
+                          <span className="RIVEN-response-time">Just now</span>
+                        </div>
+                        <p>{message.content}</p>
+                      </div>
                     </div>
-
-                    <p>{message.content}</p>
-                  </div>
+                  ) : (
+                    <div className="RIVEN-user-message">
+                      <p>{message.content}</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="RIVEN-user-message">
-                  {message.content}
+              ))}
+
+              {isThinking && (
+                <div className="RIVEN-message-row">
+                  <div className="RIVEN-response">
+                    <div className="RIVEN-response-icon">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="RIVEN-response-body">
+                      <div className="RIVEN-response-header">
+                        <span className="RIVEN-response-label">RIVEN</span>
+                        <span className="RIVEN-thinking-tag">PROCESSING</span>
+                      </div>
+                      <div className="RIVEN-thinking">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-          ))}
-
-          {isThinking && (
-            <div className="RIVEN-message-row">
-              <div className="RIVEN-response">
-                <div className="RIVEN-response-icon">
-                  <Bot className="h-4 w-4" />
-                </div>
-
-                <div>
-                  <div className="RIVEN-response-label">
-                    RIVEN
-                  </div>
-
-                  <div className="RIVEN-thinking">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                </div>
+          ) : (
+            /* Prompt Suggestions when chat is empty */
+            <div className="RIVEN-suggestions-wrap">
+              <div className="RIVEN-suggestions-title">
+                <span>SUGGESTED QUERIES</span>
+              </div>
+              <div className="RIVEN-suggestions-grid">
+                {SUGGESTIONS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="RIVEN-suggestion-chip"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    <span>{suggestion}</span>
+                    <CornerDownLeft className="h-3 w-3 chip-icon" />
+                  </button>
+                ))}
               </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Attachment */}
-      {attachment && (
-        <div className="RIVEN-attachment-wrap">
-          <div className="RIVEN-attachment">
-            <Paperclip className="h-3.5 w-3.5" />
+          {/* Attachment Preview */}
+          {attachment && (
+            <div className="RIVEN-attachment-wrap">
+              <div className="RIVEN-attachment">
+                <Paperclip className="h-3.5 w-3.5 text-accent" />
+                <span className="RIVEN-attachment-name">{attachment.name}</span>
+                <button
+                  type="button"
+                  onClick={removeAttachment}
+                  aria-label="Remove attachment"
+                  className="RIVEN-attachment-remove"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
-            <span>{attachment.name}</span>
+          {/* Main Input Shell */}
+          <div className="RIVEN-input-shell">
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask RIVEN about events, clubs, creators, or projects..."
+              rows={2}
+              className="RIVEN-textarea"
+              aria-label="Ask RIVEN"
+            />
 
-            <button
-              type="button"
-              onClick={removeAttachment}
-              aria-label="Remove attachment"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
+            <div className="RIVEN-controls">
+              <div className="RIVEN-controls-left">
+                <label
+                  className="RIVEN-icon-button"
+                  title="Attach file (PDF, image, doc)"
+                >
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg,.webp"
+                    onChange={handleFileChange}
+                  />
+                  <Paperclip className="h-4 w-4" />
+                </label>
 
-      {/* Main input */}
-      <div className="RIVEN-input-shell">
-        <div className="RIVEN-input-label">
-          <Sparkles className="h-3 w-3" />
-          ASK RIVEN
-        </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSearch((current) => !current)}
+                  className={`RIVEN-search ${showSearch ? "active" : ""}`}
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  <span>{showSearch ? "Web Search Active" : "Web Search Off"}</span>
+                </button>
+              </div>
 
-        <textarea
-          value={value}
-          onChange={(event) =>
-            setValue(event.target.value)
-          }
-          onKeyDown={handleKeyDown}
-          placeholder="Ask RIVEN anything..."
-          rows={3}
-          className="RIVEN-textarea"
-          aria-label="Ask RIVEN"
-        />
-
-        <div className="RIVEN-controls">
-          <div className="RIVEN-controls-left">
-
-            <label
-              className="RIVEN-icon-button"
-              title="Attach file"
-            >
-              <input
-                type="file"
-                className="hidden"
-                accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg,.webp"
-                onChange={handleFileChange}
-              />
-
-              <Paperclip className="h-4 w-4" />
-            </label>
-
-            <button
-              type="button"
-              onClick={() =>
-                setShowSearch(
-                  (current) => !current
-                )
-              }
-              className={
-                showSearch
-                  ? "RIVEN-search active"
-                  : "RIVEN-search"
-              }
-            >
-              <Globe className="h-4 w-4" />
-
-              <span>
-                {showSearch
-                  ? "Web Search"
-                  : "Search Off"}
-              </span>
-            </button>
+              <button
+                type="button"
+                onClick={() => handleSubmit()}
+                disabled={!value.trim() || isThinking}
+                className={`RIVEN-send ${value.trim() && !isThinking ? "active" : ""}`}
+                aria-label="Send query"
+                title="Send query (Enter)"
+              >
+                <ArrowUp className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={
-              !value.trim() ||
-              isThinking
-            }
-            className={
-              value.trim() && !isThinking
-                ? "RIVEN-send active"
-                : "RIVEN-send"
-            }
-            aria-label="Send to RIVEN"
-            title="Send"
-          >
-            <ArrowUp className="h-5 w-5" />
-          </button>
-        </div>
+          <div className="RIVEN-hint">
+            <span>PRESS ENTER TO SEND</span>
+            <span className="hint-divider">•</span>
+            <span>SHIFT + ENTER FOR NEW LINE</span>
+          </div>
+        </Reveal>
       </div>
-
-      <div className="RIVEN-hint">
-        ENTER TO SEND
-        <span>•</span>
-        SHIFT + ENTER FOR NEW LINE
-      </div>
-
-    </div>
-  </section>
-);
+    </section>
+  );
 }

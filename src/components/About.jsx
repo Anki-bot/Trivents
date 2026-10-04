@@ -2,12 +2,8 @@
 
 import Reveal from "./Reveal";
 import {
-  Lightbulb,
-  Users,
-  Target,
-  Zap,
-  Shield,
-  Heart,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
 const APPROACH_STEPS = [
@@ -37,188 +33,105 @@ const APPROACH_STEPS = [
   },
 ];
 
-const DIFFERENTIATORS = [
-  {
-    icon: Lightbulb,
-    title: "Creative First",
-    description:
-      "We approach every project with fresh thinking and original concepts.",
-  },
-  {
-    icon: Users,
-    title: "Community Driven",
-    description:
-      "Built by students, for students — everything we do serves the community.",
-  },
-  {
-    icon: Target,
-    title: "Detail Obsessed",
-    description:
-      "From the big picture to the smallest detail, we craft every element.",
-  },
-  {
-    icon: Zap,
-    title: "Fast & Agile",
-    description:
-      "We move quickly without compromising quality — ideas become reality.",
-  },
-  {
-    icon: Shield,
-    title: "Reliable",
-    description:
-      "When we commit, we deliver. Trust is the foundation of everything.",
-  },
-  {
-    icon: Heart,
-    title: "Passionate",
-    description:
-      "This isn&apos;t just a club — it&apos;s a creative family that loves what it does.",
-  },
-];
-
-const VALUES = [
-  {
-    title: "Innovation",
-    description: "Pushing creative boundaries in everything we do.",
-  },
-  {
-    title: "Collaboration",
-    description: "Better together — every voice matters in the process.",
-  },
-  {
-    title: "Quality",
-    description: "We don't ship mediocre. Every detail gets attention.",
-  },
-  {
-    title: "Transparency",
-    description: "Open communication with our community and partners.",
-  },
-  {
-    title: "Impact",
-    description: "Creating moments that genuinely matter to people.",
-  },
-  {
-    title: "Growth",
-    description: "Always learning, always evolving, always improving.",
-  },
-];
-
 export default function About() {
   return (
     <section id="about" className="about-section">
+      <div className="about-ambient-glow" aria-hidden="true" />
+
       <div className="about-inner">
-        {/* Block 01 — Who We Are */}
-        <Reveal className="about-block">
-          <div className="about-block-label">01 — Who We Are</div>
-          <h2 className="section-heading" style={{ marginBottom: "var(--space-5)" }}>
-            The creative club of
-            <br />
-            <span className="highlight">Trinity Institute</span>
-          </h2>
-          <p className="about-intro">
-            Trivents is the social media and event creative club of Trinity
-            Institute. We are a collective of designers, writers, photographers,
-            and storytellers who believe that the best experiences are the ones
-            that bring people together.
-          </p>
-        </Reveal>
+        {/* =====================================================
+            HEADER / STORY: WHO WE ARE & WHAT WE DO
+        ===================================================== */}
+        <div className="about-header-block">
+          <Reveal>
+            <div className="about-pill-label">
+              <Sparkles className="h-3 w-3 text-accent" />
+              <span>WHO WE ARE</span>
+            </div>
 
-        {/* Block 02 — What We Do */}
-        <Reveal className="about-block" delay={1}>
-          <div className="about-block-label">02 — What We Do</div>
-          <h2 className="section-heading" style={{ marginBottom: "var(--space-5)" }}>
-            We build
-            <br />
-            <span className="highlight">experiences</span>
-          </h2>
-          <p className="about-intro">
-            From concept to execution, we create events, content, and digital
-            experiences that capture the energy of our community. Every project
-            is an opportunity to tell a story worth remembering.
-          </p>
-        </Reveal>
+            <h2 className="about-main-title">
+              THE CREATIVE COLLECTIVE OF{" "}
+              <span className="about-title-highlight">TRINITY INSTITUTE</span>
+            </h2>
+          </Reveal>
 
-        {/* Block 03 — Our Approach */}
-        <Reveal className="about-block" delay={2}>
-          <div className="about-block-label">03 — Our Approach</div>
-          <h2 className="section-heading" style={{ marginBottom: "var(--space-5)" }}>
-            How we
-            <br />
-            <span className="highlight">work</span>
-          </h2>
-          <div className="about-approach">
+          <div className="about-story-grid">
+            <Reveal delay={1} className="about-story-card">
+              <div className="about-story-card-tag">01 / IDENTITY</div>
+              <h3 className="about-story-heading">
+                We are designers, storytellers &amp; creators.
+              </h3>
+              <p className="about-story-p">
+                Trivents is the social media and event creative club of Trinity
+                Institute. We are a collective of designers, writers,
+                photographers, and storytellers who believe that the best
+                experiences are the ones that bring people together.
+              </p>
+              <div className="about-story-badges">
+                <span className="about-mini-badge">Campus Media</span>
+                <span className="about-mini-badge">Event Production</span>
+                <span className="about-mini-badge">Creative Strategy</span>
+              </div>
+            </Reveal>
+
+            <Reveal delay={2} className="about-story-card about-story-card--accent">
+              <div className="about-story-card-tag">02 / MISSION</div>
+              <h3 className="about-story-heading">
+                We craft moments that resonate.
+              </h3>
+              <p className="about-story-p">
+                From concept to execution, we create events, content, and digital
+                experiences that capture the energy of our community. Every
+                project is an opportunity to tell a story worth remembering.
+              </p>
+              <div className="about-story-badges">
+                <span className="about-mini-badge">Live Experiences</span>
+                <span className="about-mini-badge">Digital Storytelling</span>
+                <span className="about-mini-badge">Community First</span>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+
+        {/* =====================================================
+            OUR APPROACH (4-STEP HORIZONTAL FLOW)
+        ===================================================== */}
+        <div className="about-sub-block">
+          <Reveal>
+            <div className="about-section-header">
+              <div className="about-pill-label">
+                <span>03 / OUR APPROACH</span>
+              </div>
+              <h2 className="about-section-title">
+                HOW WE <span className="highlight">WORK</span>
+              </h2>
+              <p className="about-section-subtitle">
+                A structured creative process that transforms raw ideas into
+                unforgettable campus moments.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="about-approach-grid">
             {APPROACH_STEPS.map((step, index) => (
-              <div key={step.number} className="about-approach-step">
-                <div className="step-number">{step.number}</div>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-                {index < APPROACH_STEPS.length - 1 && (
-                  <span className="step-arrow">→</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </Reveal>
-
-        {/* Block 04 — What Makes Us Different */}
-        <Reveal className="about-block" delay={3}>
-          <div className="about-block-label">04 — What Makes Us Different</div>
-          <h2 className="section-heading" style={{ marginBottom: "var(--space-5)" }}>
-            Why
-            <br />
-            <span className="highlight">Trivents</span>
-          </h2>
-          <div className="about-differentiators">
-            {DIFFERENTIATORS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className="about-diff-card">
-                  <div className="diff-icon">
-                    <Icon className="h-5 w-5" />
+              <Reveal key={step.number} delay={index + 1} className="about-approach-col">
+                <div className="about-step-card">
+                  <div className="about-step-header">
+                    <span className="about-step-num">{step.number}</span>
+                    {index < APPROACH_STEPS.length - 1 && (
+                      <span className="about-step-arrow" aria-hidden="true">
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    )}
                   </div>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
+                  <h3 className="about-step-title">{step.title}</h3>
+                  <p className="about-step-desc">{step.description}</p>
+                  <div className="about-step-glow" />
                 </div>
-              );
-            })}
-          </div>
-        </Reveal>
-
-        {/* Block 05 — Vision */}
-        <Reveal className="about-block" delay={4}>
-          <div className="about-block-label">05 — Vision</div>
-          <div className="about-vision">
-            <h3>
-              A campus where every
-              <br />
-              moment matters.
-            </h3>
-            <p>
-              We envision a Trinity Institute where every event is an experience,
-              every story is told with intention, and every student feels
-              connected to something larger than themselves. Trivents is more
-              than a club — it&apos;s the creative heartbeat of our community.
-            </p>
-          </div>
-        </Reveal>
-
-        {/* Block 06 — Values */}
-        <Reveal className="about-block" delay={5}>
-          <div className="about-block-label">06 — Values</div>
-          <h2 className="section-heading" style={{ marginBottom: "var(--space-5)" }}>
-            What we
-            <br />
-            <span className="highlight">believe</span>
-          </h2>
-          <div className="about-values">
-            {VALUES.map((value) => (
-              <div key={value.title} className="about-value">
-                <h4>{value.title}</h4>
-                <p>{value.description}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

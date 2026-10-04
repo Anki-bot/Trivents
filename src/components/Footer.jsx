@@ -142,6 +142,19 @@ export default function Footer() {
             </button>
           </div>
         </div>
+
+        {/* Production credit */}
+        <div className="footer-production-credit">
+          <span>Taken into Production by </span>
+          <a
+            href="https://github.com/Sakshamxx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-production-link"
+          >
+            Saksham
+          </a>
+        </div>
       </div>
     </footer>
   );
