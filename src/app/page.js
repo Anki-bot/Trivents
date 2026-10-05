@@ -1,6 +1,5 @@
 "use client";
 
-import LenisProvider from "@/components/LenisProvider";
 import Loader from "@/components/Loader";
 import Navigation from "@/components/Navigation";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -13,6 +12,7 @@ import Footer from "@/components/Footer";
 import SpectralGhost from "@/components/SpectralGhost";
 import ClosingParticleImage from "@/components/ClosingParticleImage";
 import Contact from "@/components/Contact";
+import HeaderVisibility from "@/components/HeaderVisibility";
 
 const particles = [
   { left: "12%", top: "18%", size: 4, opacity: 0.9 },
@@ -31,66 +31,79 @@ const particles = [
 
 export default function Home() {
   return (
-    <LenisProvider>
-      <main className="site-shell">
+    <main className="site-shell">
+      {/* Loading */}
+      <Loader />
 
-        {/* Loading */}
-        <Loader />
+      {/* Scroll Progress */}
+      <ScrollProgress />
 
-        {/* Scroll Progress */}
-        <ScrollProgress />
+      {/* Global Atmosphere */}
+      <div className="noise-layer" aria-hidden="true" />
+      <div className="vignette" aria-hidden="true" />
 
-        {/* Global Atmosphere */}
-        <div className="noise-layer" aria-hidden="true" />
-        <div className="vignette" aria-hidden="true" />
+      <div className="particle-field" aria-hidden="true">
+        {particles.map((particle, index) => (
+          <span
+            key={`${particle.left}-${particle.top}-${index}`}
+            className="particle"
+            style={{
+              left: particle.left,
+              top: particle.top,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              opacity: particle.opacity,
+            }}
+          />
+        ))}
+      </div>
 
-        <div className="particle-field" aria-hidden="true">
-          {particles.map((particle, index) => (
-            <span
-              key={`${particle.left}-${particle.top}-${index}`}
-              className="particle"
-              style={{
-                left: particle.left,
-                top: particle.top,
-                width: `${particle.size}px`,
-                height: `${particle.size}px`,
-                opacity: particle.opacity,
-              }}
-            />
-          ))}
-        </div>
+      <HeaderVisibility />
 
-        {/* Navigation */}
-        <Navigation />
+      {/* Navigation */}
+      <Navigation />
 
-        {/* Global Spectral Ghost */}
-        <SpectralGhost />
+      {/* Global Spectral Ghost */}
+      <SpectralGhost />
 
-        {/* Hero */}
-        <Hero />
+      {/* Hero */}
+      <Hero />
 
-        {/* RIVEN */}
-        <RIVENSection />
+      {/* Transition line */}
+      <div className="section-separator" aria-hidden="true" />
 
-        {/* Why Us */}
-        <WhyUs />
+      {/* RIVEN */}
+      <RIVENSection />
 
-        {/* Gallery */}
-        <Gallery />
+      {/* Transition line */}
+      <div className="section-separator" aria-hidden="true" />
 
-        {/* About */}
-        <About />
+      {/* Why Us */}
+      <WhyUs />
 
-        {/* Contact */}
-        <Contact />
+      {/* Transition line */}
+      <div className="section-separator" aria-hidden="true" />
 
-        {/* ONE Closing Particle Image Effect */}
-        <ClosingParticleImage />
+      {/* Gallery */}
+      <Gallery />
 
-        {/* Footer */}
-        <Footer />
+      {/* Transition line */}
+      <div className="section-separator" aria-hidden="true" />
 
-      </main>
-    </LenisProvider>
+      {/* About */}
+      <About />
+
+      {/* Transition line */}
+      <div className="section-separator" aria-hidden="true" />
+
+      {/* Contact */}
+      <Contact />
+
+      {/* ONE Closing Particle Image Effect */}
+      <ClosingParticleImage />
+
+      {/* Footer */}
+      <Footer />
+    </main>
   );
 }

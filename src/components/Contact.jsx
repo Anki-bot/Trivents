@@ -2,24 +2,9 @@
 
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "./Reveal";
+import TiltCard from "./TiltCard";
 
 const CONTACT_CHANNELS = [
-  {
-    name: "Email Us",
-    handle: "creative.trivents@gmail.com",
-    href: "mailto:creative.trivents@gmail.com",
-    logo: "/Logo/Gmail.avif",
-    badge: "Official",
-    external: false,
-  },
-  {
-    name: "WhatsApp Community",
-    handle: "Join the Conversation",
-    href: "https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz",
-    logo: "/Logo/whatsapp.avif",
-    badge: "Active",
-    external: true,
-  },
   {
     name: "Instagram",
     handle: "@trivent_s",
@@ -27,6 +12,30 @@ const CONTACT_CHANNELS = [
     logo: "/Logo/instagram.avif",
     badge: "Follow",
     external: true,
+  },
+  {
+    name: "LinkedIn",
+    handle: "Coming soon", // TODO: add your LinkedIn handle
+    href: "", // TODO: paste your LinkedIn page URL here
+    logo: "/Logo/linkedIn.avif",
+    badge: "Connect",
+    external: true,
+  },
+  {
+    name: "WhatsApp Community",
+    handle: "Join the Conversation",
+    href: "https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz",
+    logo: "/Logo/whatsapp.jpg",
+    badge: "Active",
+    external: true,
+  },
+  {
+    name: "Email Us",
+    handle: "creative.trivents@gmail.com",
+    href: "mailto:creative.trivents@gmail.com",
+    logo: "/Logo/Gmail.avif",
+    badge: "Official",
+    external: false,
   },
 ];
 
@@ -41,16 +50,13 @@ export default function Contact() {
         ========================================= */}
         <div className="contact-copy">
           <Reveal>
-            <div className="contact-kicker">
-              <span />
-              CONTACT TRIVENTS
+            <div className="section-pill">
+              <span>CONTACT TRIVENTS</span>
             </div>
 
-            <h2 className="contact-heading">
-              LET&apos;S CREATE
-              <br />
-              <span className="contact-heading-gradient">SOMETHING</span>
-              <br />
+            <h2 className="section-title">
+              LET&apos;S CREATE{" "}
+              <span className="highlight">SOMETHING</span>{" "}
               MEMORABLE
             </h2>
 
@@ -63,43 +69,52 @@ export default function Contact() {
 
           {/* Social / Direct Contact Cards */}
           <div className="contact-channels-grid">
-            {CONTACT_CHANNELS.map((channel, idx) => (
-              <Reveal key={channel.name} delay={idx + 1}>
-                <a
-                  href={channel.href}
-                  target={channel.external ? "_blank" : undefined}
-                  rel={channel.external ? "noopener noreferrer" : undefined}
-                  className="contact-channel-card"
-                >
-                  <div className="contact-channel-logo-wrap">
-                    <img
-                      src={channel.logo}
-                      alt={`${channel.name} logo`}
-                      className="contact-channel-logo"
-                      loading="lazy"
-                    />
-                  </div>
+            {CONTACT_CHANNELS.map((channel, idx) => {
+              // A card with no link yet renders as a plain block, not a dead link
+              const hasLink = Boolean(channel.href);
+              const Card = hasLink ? "a" : "div";
 
-                  <div className="contact-channel-info">
-                    <div className="contact-channel-top">
-                      <span className="contact-channel-name">
-                        {channel.name}
-                      </span>
-                      <span className="contact-channel-badge">
-                        {channel.badge}
+              const linkProps = hasLink
+                ? {
+                    href: channel.href,
+                    target: channel.external ? "_blank" : undefined,
+                    rel: channel.external ? "noopener noreferrer" : undefined,
+                  }
+                : { "aria-disabled": "true" };
+
+              return (
+                <Reveal key={channel.name} delay={idx + 1}>
+                  <Card {...linkProps} className="contact-channel-card">
+                    <div className="contact-channel-logo-wrap">
+                      <img
+                        src={channel.logo}
+                        alt={`${channel.name} logo`}
+                        className="contact-channel-logo"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <div className="contact-channel-info">
+                      <div className="contact-channel-top">
+                        <span className="contact-channel-name">
+                          {channel.name}
+                        </span>
+                        <span className="contact-channel-badge">
+                          {channel.badge}
+                        </span>
+                      </div>
+                      <span className="contact-channel-handle">
+                        {channel.handle}
                       </span>
                     </div>
-                    <span className="contact-channel-handle">
-                      {channel.handle}
-                    </span>
-                  </div>
 
-                  <div className="contact-channel-arrow">
-                    <ArrowUpRight className="h-4 w-4" />
-                  </div>
-                </a>
-              </Reveal>
-            ))}
+                    <div className="contact-channel-arrow">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </div>
+                  </Card>
+                </Reveal>
+              );
+            })}
           </div>
 
           {/* Action Button */}
@@ -112,9 +127,6 @@ export default function Contact() {
                 <span>Join Us Now</span>
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
-              <span className="contact-response-time">
-                Typical response time: within 24 hours
-              </span>
             </div>
           </Reveal>
         </div>
@@ -123,24 +135,36 @@ export default function Contact() {
             RIGHT — CAMPUS VISUAL
         ========================================= */}
         <Reveal delay={2} className="contact-visual">
-          <div className="contact-image-frame">
+          <TiltCard className="contact-image-frame" intensity={5}>
+            <div className="hud-corner hud-corner--tl" />
+            <div className="hud-corner hud-corner--tr" />
+            <div className="hud-corner hud-corner--bl" />
+            <div className="hud-corner hud-corner--br" />
+
             <div className="contact-image-box">
               <img
-                src="/closing/College.jpeg"
+                src="/closing/College.png"
                 alt="Trinity Institute, Greater Noida"
                 className="contact-campus-image"
-                loading="lazy"
+                loading="eager"
               />
               <div className="contact-image-overlay" />
             </div>
 
             <div className="contact-image-footer">
               <div className="contact-location-dot" />
-              <div className="contact-image-caption">
-                TRIVENTS @TIIPS GN • GREATER NOIDA
-              </div>
+              <a
+                href="https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-image-caption"
+              >
+                <p style={{ textAlign: "center" }}>
+                  Join the Trivents Family • Greater Noida Campus
+                </p>
+              </a>
             </div>
-          </div>
+          </TiltCard>
         </Reveal>
       </div>
     </section>

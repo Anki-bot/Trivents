@@ -19,23 +19,43 @@ export default function ClosingParticleImage() {
     let raf = null;
     let destroyed = false;
 
+    // Smoothed animation progress (0 → 1). Chases the scroll target slowly.
+    let smoothP = 0;
+
     // =========================================================
     // EASY SETTINGS
     // =========================================================
 
     // Lower = fewer image pixels
-    const SAMPLE_WIDTH = 150;
+    const SAMPLE_WIDTH = 180;
 
-    // VERY SUBTLE VISIBILITY
-    // 0.12 = 12%
-    const MAX_OPACITY = 0.2;
+    // Max opacity of the particles (1 = fully visible)
+    const MAX_OPACITY = 0.5;
 
     // How far the image pixels scatter
-    const SCATTER_DISTANCE = 950;
+    const SCATTER_DISTANCE = 1000;
 
-    // Pixel size
-    // Increase to 5.0 for even chunkier pixels
-    const PIXEL_SIZE_MULTIPLIER = 0.45;
+    // Pixel size multiplier
+    const PIXEL_SIZE_MULTIPLIER = 0.5;
+
+    // ---- TIMING (tune these) ----
+
+    // START: how far into the Why Us section the build begins.
+    // 0 = when Why Us reaches the top of the screen,
+    // 0.5 = halfway through Why Us, -0.5 = starts a half-screen earlier.
+    // (measured in screen heights)
+    const START_VIEWPORTS_FROM_WHY_US = 0;
+
+    // END: finish this many screen-heights BEFORE Contact's top edge
+    // reaches the top of the screen.
+    // 0.25 = done as Contact scrolls into view (recommended, since the
+    //        smoothing makes the animation trail your scroll slightly)
+    // 0    = done exactly when Contact's top hits the top of the screen
+    const END_VIEWPORTS_BEFORE_CONTACT = 0.25;
+
+    // How quickly the animation catches up to your scroll.
+    // Lower = slower and smoother (0.03 slow, 0.05 default, 0.1 snappy)
+    const SMOOTHING = 0.05;
 
     // =========================================================
     // HELPERS
@@ -50,10 +70,7 @@ export default function ClosingParticleImage() {
     };
 
     const randomFromIndex = (index) => {
-      const x =
-        Math.sin(index * 12.9898) *
-        43758.5453123;
-
+      const x = Math.sin(index * 12.9898) * 43758.5453123;
       return x - Math.floor(x);
     };
 
@@ -80,15 +97,8 @@ export default function ClosingParticleImage() {
         antialias: true,
       });
 
-      renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 2)
-      );
-
-      renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-      );
-
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setClearColor(0x000000, 0);
 
       renderer.domElement.style.position = "absolute";
@@ -97,9 +107,7 @@ export default function ClosingParticleImage() {
       renderer.domElement.style.height = "100%";
       renderer.domElement.style.pointerEvents = "none";
 
-      container.appendChild(
-        renderer.domElement
-      );
+      container.appendChild(renderer.domElement);
     };
 
     // =========================================================
@@ -107,52 +115,24 @@ export default function ClosingParticleImage() {
     // =========================================================
 
     const buildParticles = (image) => {
-      const imageBox =
-        document.querySelector(
-          ".contact-image-box"
-        );
-
+      const imageBox = document.querySelector(".contact-image-box");
       if (!imageBox) return;
 
-      const boxRect =
-        imageBox.getBoundingClientRect();
+      const boxRect = imageBox.getBoundingClientRect();
+      const boxAspect = boxRect.width / Math.max(1, boxRect.height);
+      const sourceAspect = image.width / Math.max(1, image.height);
 
-      const boxAspect =
-        boxRect.width /
-        Math.max(1, boxRect.height);
+      const sampleWidth = SAMPLE_WIDTH;
+      const sampleHeight = Math.max(1, Math.round(sampleWidth / boxAspect));
 
-      const sourceAspect =
-        image.width /
-        Math.max(1, image.height);
-
-      const sampleWidth =
-        SAMPLE_WIDTH;
-
-      const sampleHeight =
-        Math.max(
-          1,
-          Math.round(
-            sampleWidth / boxAspect
-          )
-        );
-
-      const canvas =
-        document.createElement("canvas");
-
+      const canvas = document.createElement("canvas");
       canvas.width = sampleWidth;
       canvas.height = sampleHeight;
 
-      const ctx =
-        canvas.getContext("2d", {
-          willReadFrequently: true,
-        });
-
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
 
-      // =======================================================
       // MATCH OBJECT-FIT: COVER
-      // =======================================================
-
       let sx = 0;
       let sy = 0;
       let sw = image.width;
@@ -160,113 +140,51 @@ export default function ClosingParticleImage() {
 
       if (sourceAspect > boxAspect) {
         // Crop left/right
-        sw =
-          image.height * boxAspect;
-
-        sx =
-          (image.width - sw) / 2;
+        sw = image.height * boxAspect;
+        sx = (image.width - sw) / 2;
       } else {
         // Crop top/bottom
-        sh =
-          image.width / boxAspect;
-
-        sy =
-          (image.height - sh) / 2;
+        sh = image.width / boxAspect;
+        sy = (image.height - sh) / 2;
       }
 
-      ctx.drawImage(
-        image,
-        sx,
-        sy,
-        sw,
-        sh,
-        0,
-        0,
-        sampleWidth,
-        sampleHeight
-      );
+      ctx.drawImage(image, sx, sy, sw, sh, 0, 0, sampleWidth, sampleHeight);
 
-      const pixelData =
-        ctx.getImageData(
-          0,
-          0,
-          sampleWidth,
-          sampleHeight
-        ).data;
+      const pixelData = ctx.getImageData(0, 0, sampleWidth, sampleHeight).data;
 
       const targetPositions = [];
       const scatteredPositions = [];
       const colors = [];
 
-      // =======================================================
       // ONE PARTICLE = ONE IMAGE PIXEL
-      // =======================================================
+      for (let y = 0; y < sampleHeight; y += 1) {
+        for (let x = 0; x < sampleWidth; x += 1) {
+          const index = (y * sampleWidth + x) * 4;
 
-      for (
-        let y = 0;
-        y < sampleHeight;
-        y += 1
-      ) {
-        for (
-          let x = 0;
-          x < sampleWidth;
-          x += 1
-        ) {
-          const index =
-            (y * sampleWidth + x) * 4;
-
-          const r =
-            pixelData[index] / 255;
-
-          const g =
-            pixelData[index + 1] / 255;
-
-          const b =
-            pixelData[index + 2] / 255;
-
-          const a =
-            pixelData[index + 3] / 255;
+          const r = pixelData[index] / 255;
+          const g = pixelData[index + 1] / 255;
+          const b = pixelData[index + 2] / 255;
+          const a = pixelData[index + 3] / 255;
 
           if (a < 0.05) continue;
 
-          // Exact image position
+          // Exact image position (0..1)
           targetPositions.push(
             x / (sampleWidth - 1),
             y / (sampleHeight - 1)
           );
 
-          // Exact color from photograph
+          // Exact color from the photograph
           colors.push(r, g, b);
 
-          // ===================================================
-          // SCATTER THIS SAME IMAGE PIXEL
-          // ===================================================
+          // Scatter this same image pixel
+          const seed = index + 1;
+          const rx = randomFromIndex(seed + 11);
+          const ry = randomFromIndex(seed + 73);
+          const rz = randomFromIndex(seed + 137);
 
-          const seed =
-            index + 1;
-
-          const rx =
-            randomFromIndex(
-              seed + 11
-            );
-
-          const ry =
-            randomFromIndex(
-              seed + 73
-            );
-
-          const rz =
-            randomFromIndex(
-              seed + 137
-            );
-
-          const angle =
-            rx * Math.PI * 2;
-
-          const radius =
-            180 +
-            Math.pow(ry, 0.55) *
-              SCATTER_DISTANCE;
+          const angle = rx * Math.PI * 2;
+          const radius = 180 + Math.pow(ry, 0.55) * SCATTER_DISTANCE;
 
           scatteredPositions.push(
             Math.cos(angle) * radius,
@@ -276,145 +194,86 @@ export default function ClosingParticleImage() {
         }
       }
 
-      const count =
-        targetPositions.length / 2;
+      const count = targetPositions.length / 2;
 
-      // =======================================================
       // CLEAN OLD OBJECTS
-      // =======================================================
+      if (geometry) geometry.dispose();
+      if (material) material.dispose();
+      if (points) scene.remove(points);
 
-      if (geometry) {
-        geometry.dispose();
-      }
-
-      if (material) {
-        material.dispose();
-      }
-
-      if (points) {
-        scene.remove(points);
-      }
-
-      // =======================================================
       // GEOMETRY
-      // =======================================================
-
-      geometry =
-        new THREE.BufferGeometry();
+      geometry = new THREE.BufferGeometry();
 
       geometry.setAttribute(
         "position",
-        new THREE.Float32BufferAttribute(
-          new Float32Array(
-            count * 3
-          ),
-          3
-        )
+        new THREE.Float32BufferAttribute(new Float32Array(count * 3), 3)
       );
 
       geometry.setAttribute(
         "aTarget",
-        new THREE.Float32BufferAttribute(
-          targetPositions,
-          2
-        )
+        new THREE.Float32BufferAttribute(targetPositions, 2)
       );
 
       geometry.setAttribute(
         "aScatter",
-        new THREE.Float32BufferAttribute(
-          scatteredPositions,
-          3
-        )
+        new THREE.Float32BufferAttribute(scatteredPositions, 3)
       );
 
       geometry.setAttribute(
         "aColor",
-        new THREE.Float32BufferAttribute(
-          colors,
-          3
-        )
+        new THREE.Float32BufferAttribute(colors, 3)
       );
 
-      // =======================================================
       // PIXEL MATERIAL
-      // =======================================================
+      material = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
 
-      material =
-        new THREE.ShaderMaterial({
-          transparent: true,
-          depthWrite: false,
-          depthTest: false,
+        uniforms: {
+          uOpacity: { value: 0 },
+          uPixelSize: { value: 1 },
+        },
 
-          uniforms: {
-            uOpacity: {
-              value: 0,
-            },
+        vertexShader: `
+          precision highp float;
 
-            uPixelSize: {
-              value: 1,
-            },
-          },
+          attribute vec3 aColor;
 
-          vertexShader: `
-            precision highp float;
+          uniform float uPixelSize;
 
-            attribute vec3 aColor;
+          varying vec3 vColor;
 
-            uniform float uPixelSize;
+          void main() {
+            vColor = aColor;
 
-            varying vec3 vColor;
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
 
-            void main() {
-              vColor = aColor;
+            gl_Position = projectionMatrix * mvPosition;
 
-              vec4 mvPosition =
-                modelViewMatrix *
-                vec4(position, 1.0);
+            // Square pixel, no circular falloff
+            gl_PointSize = uPixelSize;
+          }
+        `,
 
-              gl_Position =
-                projectionMatrix *
-                mvPosition;
+        fragmentShader: `
+          precision highp float;
 
-              /*
-               * Square pixel.
-               * No circular particle falloff.
-               */
-              gl_PointSize = uPixelSize;
-            }
-          `,
+          varying vec3 vColor;
 
-          fragmentShader: `
-            precision highp float;
+          uniform float uOpacity;
 
-            varying vec3 vColor;
+          void main() {
+            // Hard square image pixel
+            gl_FragColor = vec4(vColor, uOpacity);
+          }
+        `,
+      });
 
-            uniform float uOpacity;
-
-            void main() {
-              /*
-               * HARD SQUARE IMAGE PIXEL
-               */
-              gl_FragColor =
-                vec4(
-                  vColor,
-                  uOpacity
-                );
-            }
-          `,
-        });
-
-      points =
-        new THREE.Points(
-          geometry,
-          material
-        );
-
+      points = new THREE.Points(geometry, material);
       scene.add(points);
 
-      console.log(
-        `ClosingParticleImage: ${count} image pixels created`
-      );
+      console.log(`ClosingParticleImage: ${count} image pixels created`);
     };
 
     // =========================================================
@@ -422,392 +281,175 @@ export default function ClosingParticleImage() {
     // =========================================================
 
     const loadImage = () => {
-      const imageElement =
-        document.querySelector(
-          ".contact-image-box img"
-        );
+      const imageElement = document.querySelector(".contact-image-box img");
 
       if (!imageElement) {
-        console.error(
-          "ClosingParticleImage: .contact-image-box img not found"
-        );
+        console.error("ClosingParticleImage: .contact-image-box img not found");
         return;
       }
 
-      const src =
-        imageElement.currentSrc ||
-        imageElement.src;
+      const src = imageElement.currentSrc || imageElement.src;
 
-      const image =
-        new Image();
+      const image = new Image();
 
       image.onload = () => {
         if (destroyed) return;
-
         buildParticles(image);
       };
 
       image.onerror = () => {
-        console.error(
-          "ClosingParticleImage: failed to load",
-          src
-        );
+        console.error("ClosingParticleImage: failed to load", src);
       };
 
       image.src = src;
     };
 
     // =========================================================
-    // UPDATE
+    // UPDATE (runs every frame)
     // =========================================================
 
     const update = () => {
-      if (
-        destroyed ||
-        !renderer
-      ) {
-        return;
-      }
+      if (destroyed || !renderer) return;
 
-      /*
-       * Keep animation running while image loads.
-       */
+      // Keep the loop alive while the image loads
       if (!geometry) {
-        renderer.render(
-          scene,
-          camera
-        );
-
-        raf =
-          requestAnimationFrame(
-            update
-          );
-
+        renderer.render(scene, camera);
+        raf = requestAnimationFrame(update);
         return;
       }
 
-      const whyUs =
-        document.querySelector(
-          "#why-us"
-        );
+      const whyUs = document.querySelector("#why-us"); // optional anchor
+      const contact = document.querySelector("#contact");
+      const imageBox = document.querySelector(".contact-image-box");
 
-      const contact =
-        document.querySelector(
-          "#contact"
-        );
-
-      const imageBox =
-        document.querySelector(
-          ".contact-image-box"
-        );
-
-      if (
-        !whyUs ||
-        !contact ||
-        !imageBox
-      ) {
-        renderer.render(
-          scene,
-          camera
-        );
-
-        raf =
-          requestAnimationFrame(
-            update
-          );
-
+      if (!contact || !imageBox) {
+        renderer.render(scene, camera);
+        raf = requestAnimationFrame(update);
         return;
       }
 
-      const whyRect =
-        whyUs.getBoundingClientRect();
-
-      const contactRect =
-        contact.getBoundingClientRect();
-
-      const imageRect =
-        imageBox.getBoundingClientRect();
+      const contactRect = contact.getBoundingClientRect();
+      const imageRect = imageBox.getBoundingClientRect();
 
       // =======================================================
-      // DOCUMENT POSITIONS
+      // PROGRESS — tied to the Contact section, then smoothed
       // =======================================================
 
-      const whyDocumentTop =
-        window.scrollY +
-        whyRect.top;
+      const vh = window.innerHeight;
+      const contactDocumentTop = window.scrollY + contactRect.top;
 
-      const contactDocumentTop =
-        window.scrollY +
-        contactRect.top;
+      // START: inside the Why Us section
+      // (falls back to 3 screens above Contact if #why-us is missing)
+      const whyDocumentTop = whyUs
+        ? window.scrollY + whyUs.getBoundingClientRect().top
+        : contactDocumentTop - vh * 3;
 
-      // =======================================================
-      // ANIMATION RANGE
-      // =======================================================
+      const start = whyDocumentTop + vh * START_VIEWPORTS_FROM_WHY_US;
 
-      /*
-       * START:
-       * Late in Why Us.
-       */
-      const start =
-        whyDocumentTop +
-        whyRect.height * 0.55;
+      // END: as Contact arrives, long before the footer
+      const end = contactDocumentTop - vh * END_VIEWPORTS_BEFORE_CONTACT;
 
-      /*
-       * END:
-       * Before Contact enters.
-       *
-       * This guarantees the image is already
-       * reconstructed when Contact appears.
-       */
-      const end =
-        contactDocumentTop -
-        window.innerHeight * 0.15;
+      const range = Math.max(1, end - start);
+      const targetP = clamp((window.scrollY - start) / range, 0, 1);
 
-      const range =
-        Math.max(
-          1,
-          end - start
-        );
-
-      const rawProgress =
-        (
-          window.scrollY -
-          start
-        ) / range;
-
-      const p =
-        clamp(
-          rawProgress,
-          0,
-          1
-        );
+      // Chase the target gradually so it never snaps on fast scrolls
+      smoothP += (targetP - smoothP) * SMOOTHING;
+      const p = smoothP;
 
       // =======================================================
-      // VISIBILITY
+      // PARTICLE VISIBILITY
+      //
+      // 0.00 - 0.15  invisible
+      // 0.15 - 0.35  fade in
+      // 0.35 - 0.82  full
+      // 0.82 - 1.00  fade out (real image takes over)
       // =======================================================
-
-      /*
-       * Very subtle.
-       *
-       * 0.00 - 0.15  invisible
-       * 0.15 - 0.35  fade in
-       * 0.35 - 0.82  12%
-       * 0.82 - 1.00  fade out
-       */
 
       let particleOpacity = 0;
 
-      if (
-        p >= 0.15 &&
-        p < 0.35
-      ) {
-        particleOpacity =
-          ease(
-            (p - 0.15) / 0.20
-          ) *
-          MAX_OPACITY;
-      } else if (
-        p >= 0.35 &&
-        p < 0.82
-      ) {
-        particleOpacity =
-          MAX_OPACITY;
-      } else if (
-        p >= 0.82 &&
-        p <= 1
-      ) {
-        particleOpacity =
-          (
-            1 -
-            ease(
-              (p - 0.82) / 0.18
-            )
-          ) *
-          MAX_OPACITY;
+      if (p >= 0.15 && p < 0.35) {
+        particleOpacity = ease((p - 0.15) / 0.2) * MAX_OPACITY;
+      } else if (p >= 0.35 && p < 0.82) {
+        particleOpacity = MAX_OPACITY;
+      } else if (p >= 0.82 && p <= 1) {
+        particleOpacity = (1 - ease((p - 0.82) / 0.18)) * MAX_OPACITY;
       }
 
-      material.uniforms.uOpacity.value =
-        particleOpacity;
+      material.uniforms.uOpacity.value = particleOpacity;
 
       // =======================================================
       // PIXEL SIZE
       // =======================================================
 
-      /*
-       * Size based on the actual image width.
-       * Still represents sampled pixels.
-       */
-      const pixelScale =
-        imageRect.width /
-        SAMPLE_WIDTH;
+      const pixelScale = imageRect.width / SAMPLE_WIDTH;
+      const dpr = renderer.getPixelRatio();
 
-      const dpr =
-        renderer.getPixelRatio();
-
-      material.uniforms.uPixelSize.value =
-        Math.max(
-          1,
-          pixelScale *
-            dpr *
-            PIXEL_SIZE_MULTIPLIER
-        );
+      material.uniforms.uPixelSize.value = Math.max(
+        1,
+        pixelScale * dpr * PIXEL_SIZE_MULTIPLIER
+      );
 
       // =======================================================
-      // REAL IMAGE
+      // REAL IMAGE (fades in after reconstruction)
       // =======================================================
 
-      const realImage =
-        imageBox.querySelector(
-          "img"
-        );
+      const realImage = imageBox.querySelector("img");
 
       if (realImage) {
         let imageOpacity = 0;
 
-        /*
-         * Start revealing the real image
-         * after the particle reconstruction.
-         */
         if (p >= 0.86) {
-          imageOpacity =
-            ease(
-              (p - 0.86) / 0.14
-            );
+          imageOpacity = ease((p - 0.86) / 0.14);
         }
 
-        realImage.style.opacity =
-          String(
-            clamp(
-              imageOpacity,
-              0,
-              1
-            )
-          );
+        realImage.style.opacity = String(clamp(imageOpacity, 0, 1));
       }
 
       // =======================================================
       // RECONSTRUCTION
+      //
+      // 0.00 - 0.20  stay scattered
+      // 0.20 - 1.00  slowly return to exact image coordinates
       // =======================================================
 
-      /*
-       * 0.00 - 0.20
-       * Stay scattered.
-       *
-       * 0.20 - 1.00
-       * Slowly return to exact image coordinates.
-       *
-       * At p = 1 the image is COMPLETELY reconstructed.
-       */
-      const reconstruction =
-        ease(
-          clamp(
-            (p - 0.20) / 0.80,
-            0,
-            1
-          )
-        );
+      const reconstruction = ease(clamp((p - 0.2) / 0.8, 0, 1));
 
-      const positionAttribute =
-        geometry.getAttribute(
-          "position"
-        );
+      const positionAttribute = geometry.getAttribute("position");
+      const targetAttribute = geometry.getAttribute("aTarget");
+      const scatterAttribute = geometry.getAttribute("aScatter");
 
-      const targetAttribute =
-        geometry.getAttribute(
-          "aTarget"
-        );
+      const positions = positionAttribute.array;
+      const targets = targetAttribute.array;
+      const scatters = scatterAttribute.array;
 
-      const scatterAttribute =
-        geometry.getAttribute(
-          "aScatter"
-        );
-
-      const positions =
-        positionAttribute.array;
-
-      const targets =
-        targetAttribute.array;
-
-      const scatters =
-        scatterAttribute.array;
-
-      // =======================================================
       // MOVE PIXELS
-      // =======================================================
+      for (let i = 0, j = 0; i < targets.length; i += 2, j += 3) {
+        const u = targets[i];
+        const v = targets[i + 1];
 
-      for (
-        let i = 0, j = 0;
-        i < targets.length;
-        i += 2, j += 3
-      ) {
-        const u =
-          targets[i];
-
-        const v =
-          targets[i + 1];
-
-        /*
-         * Exact position inside the
-         * actual Contact image.
-         */
+        // Exact position inside the actual Contact image
         const targetX =
-          imageRect.left +
-          u * imageRect.width -
-          window.innerWidth / 2;
+          imageRect.left + u * imageRect.width - window.innerWidth / 2;
 
         const targetY =
-          -(
-            imageRect.top +
-            v * imageRect.height
-          ) +
-          window.innerHeight / 2;
+          -(imageRect.top + v * imageRect.height) + window.innerHeight / 2;
 
-        /*
-         * Scatter -> image.
-         */
-        positions[j] =
-          scatters[j] +
-          (
-            targetX -
-            scatters[j]
-          ) *
-            reconstruction;
+        // Scatter → image
+        positions[j] = scatters[j] + (targetX - scatters[j]) * reconstruction;
 
         positions[j + 1] =
-          scatters[j + 1] +
-          (
-            targetY -
-            scatters[j + 1]
-          ) *
-            reconstruction;
+          scatters[j + 1] + (targetY - scatters[j + 1]) * reconstruction;
 
-        /*
-         * Z returns to image plane.
-         */
-        positions[j + 2] =
-          scatters[j + 2] *
-          (
-            1 -
-            reconstruction
-          );
+        // Z returns to the image plane
+        positions[j + 2] = scatters[j + 2] * (1 - reconstruction);
       }
 
-      positionAttribute.needsUpdate =
-        true;
+      positionAttribute.needsUpdate = true;
 
-      // =======================================================
       // RENDER
-      // =======================================================
+      renderer.render(scene, camera);
 
-      renderer.render(
-        scene,
-        camera
-      );
-
-      raf =
-        requestAnimationFrame(
-          update
-        );
+      raf = requestAnimationFrame(update);
     };
 
     // =========================================================
@@ -815,36 +457,18 @@ export default function ClosingParticleImage() {
     // =========================================================
 
     const resize = () => {
-      if (
-        !renderer ||
-        !camera
-      ) {
-        return;
-      }
+      if (!renderer || !camera) return;
 
-      camera.left =
-        -window.innerWidth / 2;
-
-      camera.right =
-        window.innerWidth / 2;
-
-      camera.top =
-        window.innerHeight / 2;
-
-      camera.bottom =
-        -window.innerHeight / 2;
+      camera.left = -window.innerWidth / 2;
+      camera.right = window.innerWidth / 2;
+      camera.top = window.innerHeight / 2;
+      camera.bottom = -window.innerHeight / 2;
 
       camera.updateProjectionMatrix();
 
-      renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-      );
+      renderer.setSize(window.innerWidth, window.innerHeight);
 
-      /*
-       * Re-sample image because
-       * Contact image dimensions may change.
-       */
+      // Re-sample the image because the Contact box size may have changed
       loadImage();
     };
 
@@ -853,15 +477,10 @@ export default function ClosingParticleImage() {
     // =========================================================
 
     setup();
-
     loadImage();
-
     update();
 
-    window.addEventListener(
-      "resize",
-      resize
-    );
+    window.addEventListener("resize", resize);
 
     // =========================================================
     // CLEANUP
@@ -870,14 +489,9 @@ export default function ClosingParticleImage() {
     return () => {
       destroyed = true;
 
-      if (raf) {
-        cancelAnimationFrame(raf);
-      }
+      if (raf) cancelAnimationFrame(raf);
 
-      window.removeEventListener(
-        "resize",
-        resize
-      );
+      window.removeEventListener("resize", resize);
 
       geometry?.dispose();
       material?.dispose();
@@ -885,12 +499,9 @@ export default function ClosingParticleImage() {
 
       if (
         renderer?.domElement &&
-        renderer.domElement.parentNode ===
-          container
+        renderer.domElement.parentNode === container
       ) {
-        container.removeChild(
-          renderer.domElement
-        );
+        container.removeChild(renderer.domElement);
       }
     };
   }, []);

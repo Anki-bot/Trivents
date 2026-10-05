@@ -1,47 +1,54 @@
-"use client";
-
-import { ArrowRight } from "lucide-react";
+import DynamicText from "@/components/DynamicText";
+import HeroOrbit from "@/components/HeroOrbit";
 
 export default function Hero() {
   return (
     <section id="home" className="hero-section">
-      <div className="hero-content">
-        {/* Eyebrow */}
-        <div className="hero-eyebrow">
-          <span>Social Media Club of Trinity Institute</span>
-        </div>
 
-        {/* Headline */}
+      {/* Orbital visual — decorative, behind main content */}
+      <HeroOrbit />
+
+      <div className="hero-inner">
+
+        {/* Dynamic greeting — loops forever */}
+        <DynamicText />
+
+        {/* Main statement — accent-colored headline */}
         <h1 className="hero-title">
-          <span>We Capture</span>
-          <span>We Create</span>
-          <span>We Connect</span>
+          <span className="hero-title-line hero-title-line--warm">WE CREATE</span>
+          <span className="hero-title-line hero-title-line--plain">WE CAPTURE</span>
+          <span className="hero-title-line hero-title-line--accent">WE CONNECT</span>
         </h1>
 
-        {/* Description */}
-        <p className="hero-description">
-          Trivents is the creative club of Trinity Institute — building stories,
-          moments, and digital experiences with culture, creativity, and
-          community at the center.
-        </p>
-
-        {/* CTAs */}
-        <div className="hero-ctas">
-          <a href="#about" className="hero-cta-primary">
-            Discover Trivents
-            <ArrowRight className="h-4 w-4" />
-          </a>
-          <a href="#contact" className="hero-cta-secondary">
-            Get in Touch
-          </a>
+        {/* Sub-rule */}
+        <div className="hero-rule" aria-hidden="true">
+          <span className="hero-rule-line" />
+          <span className="hero-rule-mark" />
+          <span className="hero-rule-line" />
         </div>
+
+        {/* Supporting copy */}
+        <div className="hero-bottom">
+          <p className="hero-description">
+            Stories, moments and digital experiences
+            created for the people who make Trivents what it is.
+          </p>
+
+          <div className="hero-index">
+            <span>01</span>
+            <span className="hero-index-line" />
+            <span>TRIVENTS</span>
+          </div>
+        </div>
+
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="hero-scroll-indicator">
-        <span>Scroll</span>
-        <div className="hero-scroll-line" />
+      {/* Bottom edge scroll cue */}
+      <div className="hero-scroll">
+        <span>SCROLL TO EXPLORE</span>
+        <span className="hero-scroll-arrow">↓</span>
       </div>
+
     </section>
   );
 }

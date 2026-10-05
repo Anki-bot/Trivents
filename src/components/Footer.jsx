@@ -1,159 +1,210 @@
 "use client";
 
-import { AtSign, MessageCircle, ArrowUp } from "lucide-react";
+/* ─────────────────────────────────────────────────────────
+   CONSTANTS & PLACEHOLDERS (Edit these values as needed)
+   ───────────────────────────────────────────────────────── */
+export const INSTAGRAM_URL = "https://www.instagram.com/trivent_s/";
+export const WHATSAPP_URL = "https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz";
+export const EMAIL_ADDRESS = "creative.trivents@gmail.com";
+export const LINKEDIN_URL = "https://www.linkedin.com/company/trivents/";
+export const GITHUB_REPO_URL = "https://github.com/Sakshamxx/Trivents";
 
-const FOOTER_NAV = [
+export const EXPLORE_LINKS = [
   { label: "Home", href: "#home" },
-  { label: "Why Us", href: "#why-us" },
-  { label: "Gallery", href: "#gallery" },
-  { label: "About", href: "#about" },
+  { label: "Who are we?", href: "#about" },
+  { label: "Riven", href: "#riven" },
+  { label: "Events", href: "#gallery" },
   { label: "Contact", href: "#contact" },
 ];
 
-const SOCIAL_LINKS = [
+export const TIMELINE_EVENTS = [
   {
-    label: "Instagram",
-    href: "https://www.instagram.com/trivent_s/",
-    icon: AtSign,
+    tag: "FEB 2026",
+    title: "Aakriti 2.0 Annual Fest",
+    description: "Official photography, multi-camera video coverage and cinematic recap reels.",
   },
   {
-    label: "WhatsApp",
-    href: "https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz",
-    icon: MessageCircle,
+    tag: "MAR 2026",
+    title: "Lens Craft Masterclass",
+    description: "Hands-on student workshop exploring manual camera controls, lighting and editing.",
+  },
+  {
+    tag: "APR 2026",
+    title: "Brand Collabs & Hackathons",
+    description: "Creative media partnerships with Beast Life, Untamed Living and Code Rangers.",
   },
 ];
 
+/* ─────────────────────────────────────────────────────────
+   INLINE GITHUB SVG (For open source contribution link)
+   ───────────────────────────────────────────────────────── */
+function GitHubIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </svg>
+  );
+}
+
 export default function Footer() {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const SOCIAL_BUTTONS = [
+    {
+      name: "Instagram",
+      href: INSTAGRAM_URL,
+      logo: "/Logo/instagram.avif",
+      external: true,
+      ariaLabel: "Follow Trivents on Instagram",
+    },
+    {
+      name: "WhatsApp",
+      href: WHATSAPP_URL,
+      logo: "/Logo/whatsapp.jpg",
+      external: true,
+      ariaLabel: "Join the Trivents WhatsApp Community",
+    },
+    {
+      name: "Gmail",
+      href: `mailto:${EMAIL_ADDRESS}`,
+      logo: "/Logo/Gmail.avif",
+      external: false,
+      ariaLabel: `Send email to ${EMAIL_ADDRESS}`,
+    },
+    {
+      name: "LinkedIn",
+      href: LINKEDIN_URL,
+      logo: "/Logo/linkedIn.avif",
+      external: true,
+      ariaLabel: "Connect with Trivents on LinkedIn",
+    },
+  ];
 
   return (
-    <footer className="footer">
+    <footer className="footer" role="contentinfo">
       <div className="footer-inner">
         <div className="footer-grid">
-          {/* Brand */}
+          {/* =========================================
+              1. BRAND & BLURB & LOGO SOCIALS
+          ========================================= */}
           <div className="footer-brand">
-            <a href="#home" className="footer-logo">
-              <img src="/images/logo.png"/>
+            <a href="#home" className="footer-logo" aria-label="Trivents Home">
+              <img src="/images/logo.png" alt="Trivents logo" width={34} height={34} />
               <span className="footer-logo-text">Trivents</span>
             </a>
+
             <p className="footer-tagline">
-              The social media and event creative club of Trinity Institute.
-              Building stories, moments, and digital experiences.
+              The official social media and creative club of Trinity Institute of
+              Innovation in Professional Studies (TIIPS). We capture campus life,
+              craft cinematic stories, and elevate student creativity.
             </p>
-            <div className="footer-social">
-              {SOCIAL_LINKS.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                );
-              })}
+
+            {/* Round Social Icon Buttons with Images */}
+            <div className="footer-social" aria-label="Social media channels">
+              {SOCIAL_BUTTONS.map((btn) => (
+                <a
+                  key={btn.name}
+                  href={btn.href}
+                  target={btn.external ? "_blank" : undefined}
+                  rel={btn.external ? "noopener noreferrer" : undefined}
+                  aria-label={btn.ariaLabel}
+                  className="footer-social-round-btn"
+                >
+                  <img
+                    src={btn.logo}
+                    alt={`${btn.name} icon`}
+                    className="footer-social-img"
+                    width={18}
+                    height={18}
+                    loading="lazy"
+                  />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* =========================================
+              2. EXPLORE NAVIGATION
+          ========================================= */}
           <div className="footer-column">
-            <h4>Navigate</h4>
-            <ul>
-              {FOOTER_NAV.map((link) => (
-                <li key={link.href}>
+            <h4>Explore</h4>
+            <ul aria-label="Footer navigation links">
+              {EXPLORE_LINKS.map((link) => (
+                <li key={link.label}>
                   <a href={link.href}>{link.label}</a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div className="footer-column">
-            <h4>Contact</h4>
-            <ul>
-              <li>
-                <a href="mailto:creative.trivents@gmail.com">creative.trivents@gmail.com</a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/trivent_s/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://chat.whatsapp.com/Dw7lBTsE9RX5DPQDp7cRUz"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  WhatsApp Community
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div className="footer-column">
-            <h4>Legal</h4>
-            <ul>
-              <li>
-                <a href="#home">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="#home">Terms of Use</a>
-              </li>
-              <li>
-                <a href="#home">Cookie Policy</a>
-              </li>
-            </ul>
+          {/* =========================================
+              3. TRIVENTS IN ACTION, 2025 (TIMELINE)
+          ========================================= */}
+          <div className="footer-column footer-timeline-column">
+            <h4>Trivents in action, 2025</h4>
+            <div className="footer-timeline" role="feed" aria-label="Trivents 2025 timeline">
+              {TIMELINE_EVENTS.map((item, idx) => (
+                <div key={idx} className="footer-timeline-item">
+                  <div className="footer-timeline-marker" aria-hidden="true">
+                    <span className="footer-timeline-dot" />
+                    {idx < TIMELINE_EVENTS.length - 1 && (
+                      <span className="footer-timeline-line" />
+                    )}
+                  </div>
+                  <div className="footer-timeline-content">
+                    <span className="footer-timeline-tag">{item.tag}</span>
+                    <h5 className="footer-timeline-title">{item.title}</h5>
+                    <p className="footer-timeline-desc">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Bottom */}
+        {/* =========================================
+            BOTTOM BAR
+        ========================================= */}
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Trivents. All rights reserved.</p>
-          <div className="footer-legal">
-            <a href="#home">Privacy</a>
-            <a href="#home">Terms</a>
-            <button
-              onClick={scrollToTop}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--text-subtle)",
-                cursor: "pointer",
-                fontSize: "11px",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                padding: 0,
-              }}
-            >
-              Back to top
-              <ArrowUp className="h-3 w-3" />
-            </button>
-          </div>
-        </div>
+          <p className="footer-copyright">
+            © {new Date().getFullYear()} Trivents. All rights reserved.
+          </p>
 
-        {/* Production credit */}
-        <div className="footer-production-credit">
-          <span>Taken into Production by </span>
-          <a
-            href="https://github.com/Sakshamxx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer-production-link"
-          >
-            Saksham
-          </a>
+          {/* Open source text link */}
+          <div className="footer-opensource-wrap">
+            <a
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-opensource-link"
+              aria-label="Open source Trivents repository on GitHub"
+            >
+              <GitHubIcon />
+              <span>Open source · Contribute on GitHub</span>
+            </a>
+          </div>
+
+          <div className="footer-bottom-right">
+            <div className="footer-production-credit">
+              <span>Taken into Production by </span>
+              <a
+                href="https://github.com/Sakshamxx"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-production-link"
+              >
+                Saksham
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

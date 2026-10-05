@@ -14,13 +14,6 @@ import {
 import RIVENHeadline from "./RIVENHeadline";
 import Reveal from "./Reveal";
 
-const SUGGESTIONS = [
-  "What is Trivents?",
-  "Tell me about upcoming events",
-  "How can I join the creative team?",
-  "Who are the core creators?",
-];
-
 export default function RIVENSection() {
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState("");
@@ -77,13 +70,6 @@ export default function RIVENSection() {
     setAttachment(null);
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setValue(suggestion);
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  };
-
   return (
     <section id="RIVEN" className="RIVEN-section">
       {/* Ambient background glow */}
@@ -93,9 +79,9 @@ export default function RIVENSection() {
       <div className="RIVEN-content">
         {/* Header Block */}
         <Reveal>
-          <div className="RIVEN-kicker">
+          <div className="section-pill">
             <span className="RIVEN-status-dot" />
-            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            <Sparkles className="h-3 w-3" />
             <span>TRIVENTS INTELLIGENCE SYSTEM</span>
           </div>
 
@@ -128,7 +114,7 @@ export default function RIVENSection() {
           </div>
 
           {/* Conversation Stream */}
-          {messages.length > 0 ? (
+          {(messages.length > 0 || isThinking) && (
             <div className="RIVEN-conversation">
               {messages.map((message) => (
                 <div
@@ -180,26 +166,6 @@ export default function RIVENSection() {
                   </div>
                 </div>
               )}
-            </div>
-          ) : (
-            /* Prompt Suggestions when chat is empty */
-            <div className="RIVEN-suggestions-wrap">
-              <div className="RIVEN-suggestions-title">
-                <span>SUGGESTED QUERIES</span>
-              </div>
-              <div className="RIVEN-suggestions-grid">
-                {SUGGESTIONS.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    className="RIVEN-suggestion-chip"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    <span>{suggestion}</span>
-                    <CornerDownLeft className="h-3 w-3 chip-icon" />
-                  </button>
-                ))}
-              </div>
             </div>
           )}
 

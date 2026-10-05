@@ -64,7 +64,7 @@ export default function SpectralGhost() {
     renderer.domElement.style.inset = "0";
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
-    renderer.domElement.style.zIndex = "1";
+    renderer.domElement.style.zIndex = "5";
     renderer.domElement.style.pointerEvents = "none";
     renderer.domElement.style.background = "transparent";
 
@@ -519,17 +519,17 @@ export default function SpectralGhost() {
 
       emissiveIntensity: 9.8,
 
-      pulseSpeed: 1.,
-      pulseIntensity: 0.6,
+      pulseSpeed: 2,
+      pulseIntensity: 1,
 
-      eyeGlowIntensity: 4.5,
+      eyeGlowIntensity: 1.5,
       eyeGlowDecay: 0.95,
       eyeGlowResponse: 0.31,
 
       rimLightIntensity: 1.8,
 
       // Movement
-      followSpeed: 0.075,
+      followSpeed: 0.25,
       wobbleAmount: 0.35,
       floatSpeed: 1.6,
       movementThreshold: 0.07,

@@ -1,4 +1,19 @@
+import { Inter, Anton } from "next/font/google";
 import "./globals.css";
+import "./cinematic.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
+  display: "swap",
+});
 
 export const metadata = {
   title: "Trivents — We Capture. We Create. We Connect.",
@@ -19,11 +34,13 @@ export const viewport = {
   initialScale: 1,
 };
 
+import LenisProvider from "@/components/LenisProvider";
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${anton.variable}`}>
       <body>
-        {children}
+        <LenisProvider>{children}</LenisProvider>
       </body>
     </html>
   );

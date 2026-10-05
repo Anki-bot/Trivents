@@ -10,22 +10,22 @@ import "./Gallery.css";
 ===================================================== */
 
 const mosaicItems = [
-  { label: "LIVE EVENTS", tag: "01", accent: "#ff552d", sub: "2024", type: "large", icon: "◈" },
-  { label: "BRAND COLLABS", tag: "02", accent: "#ff7a5a", sub: "SERIES", type: "wide", icon: "◉" },
-  { label: "UNDERGROUND", tag: "03", accent: "#ff3a1a", sub: "SESSIONS", type: "tall", icon: "▲" },
-  { label: "POP-UPS", tag: "04", accent: "#ff9070", sub: "DROPS", type: "small", icon: "◆" },
-  { label: "DIGITAL", tag: "05", accent: "#ff5533", sub: "ACTIVATIONS", type: "medium", icon: "◎" },
-  { label: "IMMERSIVE", tag: "06", accent: "#ff6644", sub: "EXPERIENCES", type: "small", icon: "❋" },
-  { label: "AFTER PARTIES", tag: "07", accent: "#ff4422", sub: "EXCLUSIVE", type: "wide", icon: "◐" },
-  { label: "ARTIST NIGHTS", tag: "08", accent: "#ff7744", sub: "CURATED", type: "medium", icon: "✦" },
-  { label: "COMMUNITY", tag: "09", accent: "#ff6633", sub: "GATHERINGS", type: "tall", icon: "◑" },
+  { label: "AAKRITI 2.0", tag: "01", accent: "#ff552d", sub: "COLLEGE EVENT", type: "large", icon: "◈" },
+  { label: "BEAST LIFE", tag: "02", accent: "#ff7a5a", sub: "BRAND COLLAB", type: "wide", icon: "◉" },
+  { label: "LENS CRAFT", tag: "03", accent: "#ff3a1a", sub: "WORKSHOP", type: "tall", icon: "▲" },
+  { label: "CODE RANGERS", tag: "04", accent: "#ff9070", sub: "HACKATHON", type: "small", icon: "◆" },
+  { label: "STARRY NIGHT", tag: "05", accent: "#ff5533", sub: "PROM NIGHT", type: "medium", icon: "◎" },
+  { label: "UNTAMED LIVING", tag: "06", accent: "#ff6644", sub: "BRAND COLLAB", type: "small", icon: "❋" },
+  { label: "EVENT BASH", tag: "07", accent: "#ff4422", sub: "GARBA EVENT", type: "wide", icon: "◐" },
+  { label: "IGMAE ODS", tag: "08", accent: "#ff7744", sub: "COMMUNITY", type: "medium", icon: "✦" },
+  { label: "BEHIND THE LENS", tag: "09", accent: "#ff6633", sub: "BTS CONTENT", type: "tall", icon: "◑" },
 ];
 
 const stats = [
-  { value: "200+", label: "Events Created" },
-  { value: "50K+", label: "Lives Touched" },
-  { value: "3", label: "Cities Active" },
-  { value: "100%", label: "Passion-Driven" },
+  { value: "20+", label: "Events Covered" },
+  { value: "500+", label: "Content Pieces" },
+  { value: "10+", label: "Brand Collabs" },
+  { value: "2K+", label: "Instagram Followers" },
 ];
 
 /* =====================================================
@@ -81,8 +81,8 @@ function GalleryTicker() {
     return () => tween.kill();
   }, []);
 
-  const words = ["TRIVENTS", "ARCHIVE", "MOMENTS", "COLLABS", "CULTURE", "LIVE"];
-  const repeated = [...words, ...words];
+  const words = ["TRIVENTS", "TIIPS GN", "LENS CRAFT", "AAKRITI", "BEAST LIFE", "STARRY NIGHT", "CODE RANGERS", "COLLABS"];
+  const repeated = [...words, ...words, ...words, ...words];
 
   return (
     <div className="gallery-ticker">
@@ -158,18 +158,14 @@ export default function Gallery() {
   return (
     <section id="gallery" className="gallery-section">
       <div className="gallery-inner">
-
         {/* ---- HEADER ---- */}
         <div className="gallery-header">
-          <div className="gallery-kicker">
-            <span />
-            GALLERY
+          <div className="section-pill">
+            <span>GALLERY</span>
           </div>
 
-          <h2>
-            COLLABS
-            <br />
-            &amp; EVENTS
+          <h2 className="section-title">
+            COLLABS &amp; <span className="highlight">EVENTS</span>
           </h2>
 
           <p>
@@ -177,10 +173,12 @@ export default function Gallery() {
             experiences created along the way.
           </p>
         </div>
+      </div>
 
-        {/* ---- TICKER ---- */}
-        <GalleryTicker />
+      {/* ---- TICKER (Full Viewport Width edge-to-edge) ---- */}
+      <GalleryTicker />
 
+      <div className="gallery-inner">
         {/* ---- MOSAIC GRID ---- */}
         <div className="gallery-mosaic" ref={mosaicRef}>
           {mosaicItems.map((item, index) => (
@@ -196,8 +194,8 @@ export default function Gallery() {
 
         {/* ---- FOOTER LABEL ---- */}
         <div className="gallery-footer">
-          <span>TRIVENTS / ARCHIVE</span>
-          <span>9 CATEGORIES</span>
+          <span>TRIVENTS / @trivent_s</span>
+          <span>TIIPS GREATER NOIDA</span>
         </div>
 
       </div>

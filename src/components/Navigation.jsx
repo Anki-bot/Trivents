@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { useLenis } from "lenis/react";
 import {
   Home,
   Sparkles,
@@ -18,88 +19,63 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact", icon: Send },
 ];
 
-// macOS dock magnification constants
-const BASE_SCALE = 1;
-const MAX_SCALE = 1.55;
-const NEIGHBOR_SCALE = 1.28;
-const MAGNETIC_RADIUS = 80; // px — how far the effect spreads
-
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [mouseX, setMouseX] = useState(null);
-  const dockRef = useRef(null);
-  const itemRefs = useRef([]);
+  const lenis = useLenis();
 
-  // ── Scroll detection ──────────────────────────────────────────────────────
+  // ── Scroll detection & Active section tracking ────────────────────────────
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      const triggerPoint = window.innerHeight * 0.4;
+      let current = NAV_LINKS[0].href.slice(1);
+
+      for (const link of NAV_LINKS) {
+        const id = link.href.slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= triggerPoint) {
+            current = id;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ── Active section tracking ───────────────────────────────────────────────
-  useEffect(() => {
-    const sections = NAV_LINKS.map((link) =>
-      document.querySelector(link.href)
-    ).filter(Boolean);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        });
-      },
-      { threshold: 0.25, rootMargin: "-70px 0px -40% 0px" }
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
-
   // ── Body scroll lock when mobile menu open ────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
-  // ── Mouse tracking for dock magnification ────────────────────────────────
-  const handleDockMouseMove = useCallback((e) => {
-    setMouseX(e.clientX);
-  }, []);
-
-  const handleDockMouseLeave = useCallback(() => {
-    setMouseX(null);
-  }, []);
-
-  /**
-   * Compute the scale for each dock item based on cursor distance from its
-   * center.  Uses a smooth cosine-like falloff (same approach as macOS).
-   */
-  const getItemScale = (idx) => {
-    if (mouseX === null) return BASE_SCALE;
-    const el = itemRefs.current[idx];
-    if (!el) return BASE_SCALE;
-
-    const rect = el.getBoundingClientRect();
-    const itemCenterX = rect.left + rect.width / 2;
-    const dist = Math.abs(mouseX - itemCenterX);
-
-    if (dist > MAGNETIC_RADIUS) return BASE_SCALE;
-
-    // Cosine-shaped falloff: 1 at dist=0, 0 at dist=MAGNETIC_RADIUS
-    const t = 1 - dist / MAGNETIC_RADIUS;
-    const eased = t * t * (3 - 2 * t); // smoothstep
-    return BASE_SCALE + (MAX_SCALE - BASE_SCALE) * eased;
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    if (lenis) {
+      lenis.scrollTo(href);
+    } else {
+      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const handleMobileNavClick = (href) => {
     setMobileOpen(false);
     setTimeout(() => {
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      if (lenis) {
+        lenis.scrollTo(href);
+      } else {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      }
     }, 280);
   };
 
@@ -107,41 +83,30 @@ export default function Navigation() {
     <>
       <header className={`nav-header ${scrolled ? "scrolled" : ""}`}>
         {/* Logo */}
-        <a href="#home" className="nav-logo" aria-label="Trivents home">
+        <a 
+          href="#home" 
+          className="nav-logo" 
+          aria-label="Trivents home"
+          onClick={(e) => handleNavClick(e, "#home")}
+        >
           <div className="nav-logo-icon-wrap">
             <img src="/images/logo.png" alt="Trivents logo" />
           </div>
           <span className="nav-logo-text">Trivents</span>
         </a>
 
-        {/* Center — Interactive Dock Navigation with magnification */}
-        <nav
-          ref={dockRef}
-          className="nav-desktop nav-dock"
-          aria-label="Main navigation dock"
-          onMouseMove={handleDockMouseMove}
-          onMouseLeave={handleDockMouseLeave}
-        >
-          {NAV_LINKS.map((link, idx) => {
+        {/* Center — Interactive Dock Navigation */}
+        <nav className="nav-desktop nav-dock" aria-label="Main navigation dock">
+          {NAV_LINKS.map((link) => {
             const Icon = link.icon;
             const isActive = activeSection === link.href.slice(1);
-            const scale = getItemScale(idx);
 
             return (
               <a
                 key={link.href}
-                ref={(el) => { itemRefs.current[idx] = el; }}
                 href={link.href}
                 className={`nav-link nav-dock-item ${isActive ? "active" : ""}`}
-                style={{
-                  transform: `scale(${scale}) translateY(${scale > 1 ? (scale - 1) * -8 : 0}px)`,
-                  transformOrigin: "bottom center",
-                  transition: mouseX === null
-                    ? "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)"
-                    : "transform 0.08s linear",
-                  willChange: "transform",
-                  zIndex: Math.round(scale * 10),
-                }}
+                onClick={(e) => handleNavClick(e, link.href)}
               >
                 <span className="nav-dock-icon-wrap">
                   <Icon className="h-3.5 w-3.5" />
@@ -155,7 +120,11 @@ export default function Navigation() {
 
         {/* Right — Quick Action & Mobile Toggle */}
         <div className="nav-actions">
-          <a href="#contact" className="nav-quick-cta">
+          <a 
+            href="#contact" 
+            className="nav-quick-cta"
+            onClick={(e) => handleNavClick(e, "#contact")}
+          >
             <span>Get in Touch</span>
             <ArrowRight className="h-3 w-3" />
           </a>
